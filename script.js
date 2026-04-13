@@ -4,6 +4,7 @@ let interval;
 let both = 0;
 let counter = 0;
 let currentBlocks = [];
+let keysPressed = {};
 
 function moveLeft() {
     let left = 
@@ -20,25 +21,42 @@ function moveRight() {
     }
 }
 
+function updateMovement() {
+    if (keysPressed['ArrowLeft']) {
+        moveLeft();
+    }
+    if (keysPressed['ArrowRight']) {
+        moveRight();
+    }
+}
+
 window.addEventListener("keydown", event => {
-    if (both==0){
-        both++;
-    }
-    if (event.key === "ArrowLeft") {
-        interval = setInterval(moveLeft, 1);
-    }
-    if (event.key === "ArrowRight"){
-        interval = setInterval(moveRight, 1);
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        keysPressed[event.key] = true;
+        if (!interval) {
+            interval = setInterval(updateMovement, 1);
+        }
     }
 });
 
 
 window.addEventListener('keyup', event => {
-    clearInterval(interval);
-    both = 0;
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        keysPressed[event.key] = false;
+        
+        // Stop interval when no keys are pressed
+        if (!keysPressed['ArrowLeft'] && !keysPressed['ArrowRight']) {
+            clearInterval(interval);
+            interval = null;
+            both = 0;
+        }
+    }
 });
 
 let blocks = setInterval (function () {
+    // Calculate speed multiplier based on score (counter)
+    let speedMultiplier = 1 + (counter / 150);
+    
     let blockLast = document.getElementById('block'+(counter -1));
     let holeLast = document.getElementById('hole'+(counter -1));
         if (counter > 0) {
@@ -77,8 +95,8 @@ let blocks = setInterval (function () {
             parseFloat(window.getComputedStyle(iblock).getPropertyValue('top'));
             let iholeLeft = 
             parseFloat(window.getComputedStyle(ihole).getPropertyValue('left'));
-            iblock.style.top = iblockTop - 0.5 + 'px';
-            ihole.style.top = iblockTop - 0.5 + 'px';
+            iblock.style.top = iblockTop - (0.5 * speedMultiplier) + 'px';
+            ihole.style.top = iblockTop - (0.5 * speedMultiplier) + 'px';
             if (iblockTop < 20) {
                 currentBlocks.shift();
                 iblock.remove();
