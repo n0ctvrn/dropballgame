@@ -1,5 +1,6 @@
 const character = document.getElementById('character');
 const game = document.getElementById('game');
+const scoreDisplay = document.getElementById('score');
 let interval;
 let both = 0;
 let counter = 0;
@@ -82,6 +83,10 @@ let blocks = setInterval (function () {
         let characterTop = parseInt(window.getComputedStyle(character).getPropertyValue('top'));
         let characterLeft = parseInt(window.getComputedStyle(character).getPropertyValue('left'));
         let drop = 0;
+        
+        // Update score display
+        scoreDisplay.textContent = Math.max(0, counter - 9);
+        
         if (characterTop <= 0) {
             alert("Permainan Berakhir. Masa cuma lewat: " + (counter-9));
             clearInterval(blocks);
